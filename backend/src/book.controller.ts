@@ -1,30 +1,35 @@
-// src/book.controller.ts
-import { Controller, Get } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { BookService } from './book.service';
-// book.controller.ts에 추가
-import { Body, Post } from '@nestjs/common';
-import { Param } from '@nestjs/common';
+import { CreateBookDto } from './dto/create-book.dto';
 
-@Controller('books') // 이 컨트롤러로 들어오는 기본 주소: /books
+@Controller('books')
 export class BookController {
-  // 주방장(BookService)을 주입받습니다.
   constructor(private readonly bookService: BookService) {}
 
-  // HTTP GET 방식으로 /books 요청이 들어왔을 때 실행되는 핸들러
   @Get()
   async getBooks(): Promise<any> {
-    return await this.bookService.getAllBooks();
+    return await this.bookService.getBooks();
   }
 
-  // POST http://localhost:3000/books
+  // 4주차: DTO 검증 + 201 Created
   @Post()
-  async createBook(@Body() body: Record<string, any>): Promise<string> {
-    return await this.bookService.createBook(body);
+  @HttpCode(HttpStatus.CREATED)
+  async createBook(@Body() dto: CreateBookDto): Promise<any> {
+    return await this.bookService.createBookOrm(dto);
   }
-  
-    // GET http://localhost:3000/books/category/1
+
   @Get('category/:categoryId')
-  async getBooksByCategory(@Param('categoryId') categoryId: string): Promise<any> {
+  async getBooksByCategory(
+    @Param('categoryId') categoryId: string,
+  ): Promise<any> {
     return await this.bookService.getBooksByCategory(Number(categoryId));
   }
 }
